@@ -37,7 +37,6 @@ section {
   box-shadow: 1px 2px 10px var(--color-4);
   padding: 10px 20px;
   border-radius: 5px;
-  
 }
 
 section h3 {
@@ -83,6 +82,11 @@ section .form {
   transition: 0.3s ease-in-out all;
 }
 
-.btn:hover{
+.btn:hover {
   transform: scale(1.05);
+}
+
+.error {
+  text-align: center;
+  color: var(--color-5);
 }
