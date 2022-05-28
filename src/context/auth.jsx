@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "../firebase"
+import Loading from "../components/Loading"
 
 export const AuthContext = createContext()
 
@@ -11,12 +12,12 @@ const AuthProvider = (props) => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setUser(user)
-      console.log(user)
       setLoading(false)
     })
   }, [])
+
   if (loading) {
-    return "Loading"
+    return <Loading />
   }
 
   return (
