@@ -2,12 +2,20 @@ import React, { useEffect, useState } from "react"
 import Camera from "../components/svg/Camera"
 import Img from "../images/image1.jpg"
 import { auth, db, storage } from "../firebase"
-import { ref, getDownloadURL, uploadBytes } from "firebase/storage"
+import {
+  ref,
+  getDownloadURL,
+  uploadBytes,
+  deleteObject,
+} from "firebase/storage"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
+import Delete from "../components/svg/Delete"
+import { useNavigate } from "react-router-dom"
 
 const Profile = () => {
   const [img, setImg] = useState("")
   const [user, setUser] = useState()
+  const navigate = useNavigate()
 
   useEffect(() => {
     getDoc(doc(db, "users", auth.currentUser.uid)).then((docSnap) => {
@@ -23,6 +31,9 @@ const Profile = () => {
           `avatar/${new Date().getTime()} - ${img.name}`
         )
         try {
+          if (user.avatarPath) {
+            await deleteObject(ref(storage, user.avatarPath))
+          }
           const snap = await uploadBytes(imgRef, img)
           const url = await getDownloadURL(ref(storage, snap.ref.fullPath))
 
@@ -40,6 +51,23 @@ const Profile = () => {
     }
   }, [img])
 
+  const deleteImage = async () => {
+    try {
+      const confirm = window.confirm("Delete avatar?")
+      if (confirm) {
+        await deleteObject(ref(storage, user.avatarPath))
+
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+          avatar: "",
+          avatarPath: "",
+        })
+        navigate("/")
+      }
+    } catch (error) {
+      console.log(error.msg)
+    }
+  }
+
   return user ? (
     <section>
       <div className="profile_container">
@@ -50,6 +78,7 @@ const Profile = () => {
               <label htmlFor="photo">
                 <Camera />
               </label>
+              {user.avatar ? <Delete deleteImage={deleteImage} /> : null}
               <input
                 type="file"
                 accept="image/*"
