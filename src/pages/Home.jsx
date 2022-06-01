@@ -58,8 +58,11 @@ const Home = () => {
       setMsgs(msgs)
     })
 
+    // get last message b/w logged in user and selected user
     const docSnap = await getDoc(doc(db, "lastMsg", id))
-    if (docSnap.data()?.from !== user1) {
+    // if last message exists and message is from selected user
+    if (docSnap.data() && docSnap.data().from !== user1) {
+      // update last message doc, set unread to false
       await updateDoc(doc(db, "lastMsg", id), {
         unread: false,
       })
